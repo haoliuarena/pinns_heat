@@ -53,20 +53,23 @@ class FCN(nn.Module):
         x = x_PDE.clone()
         x.requires_grad = True  # Enable differentiation
         u = self.forward(x)
-        u_x_t = autograd.grad(u, x, torch.ones([x.shape[0], 1]).to(device), retain_graph=True, create_graph=True)[0]  # first derivative
-        u_xx_tt = autograd.grad(u_x_t, x, torch.ones(x.shape).to(device), create_graph=True)[0]  # second derivative
-        u_x = u_x_t[:, [0]]
-        u_t = u_x_t[:, [1]]  # we select the 2nd element for t (the first one is x) (Remember the input X=[x,t])
-        u_xx = u_xx_tt[:, [0]]  # we select the 1st element for x (the second one is t) (Remember the input X=[x,t])
-        u_tt = u_xx_tt[:, [1]]
+        # u_x_t = autograd.grad(u, x, torch.ones([x.shape[0], 1]).to(device), retain_graph=True, create_graph=True)[0]  # first derivative
+        # u_xx_tt = autograd.grad(u_x_t, x, torch.ones(x.shape).to(device), create_graph=True)[0]  # second derivative
+        # u_x = u_x_t[:, [0]]
+        # u_t = u_x_t[:, [1]]  # we select the 2nd element for t (the first one is x) (Remember the input X=[x,t])
+        # u_xx = u_xx_tt[:, [0]]  # we select the 1st element for x (the second one is t) (Remember the input X=[x,t])
+        # u_tt = u_xx_tt[:, [1]]
 
         # use dde instead of autograd.grad
+        # (TODO: hao): Calculate the jacobian and hessian by pytorch.
+        # I believe the author uses dde because they realized that autograd.grad is not calculating the laplacian correctly. 
         u_t = dde.grad.jacobian(u, x, i=0, j=1)  # Compute Jacobian matrix J: J[i][j] = dy_i / dx_j
         u_xx = dde.grad.hessian(u, x, i=0, j=0)  # Compute Hessian matrix H: H[i][j] = d^2y / dx_i dx_j
 
         if self.case == "example_1":
-            f = torch.exp(-x[:, 1:]) * (torch.sin(np.pi * x[:, 0:1]) - np.pi**2 * torch.sin(np.pi * x[:, 0:1]))
-            u = u_t - u_xx + f
+            # f is the source term. Commented this line out because I want to try a PDE without source term.
+            # f = torch.exp(-x[:, 1:]) * (torch.sin(np.pi * x[:, 0:1]) - np.pi**2 * torch.sin(np.pi * x[:, 0:1]))
+            u = u_t - (1. / np.pi**2) * u_xx
         elif self.case == "example_2":
             zt = 2 * (x[:, 0:1] ** 2) * ((x[:, 0:1] - x_max) ** 2) * (x[:, 1:] - 1 / 2)
             zxx = (2 * ((x[:, 0:1] - x_max) ** 2) + 4 * x[:, 0:1] * (x[:, 0:1] - x_max) + 6 * (x[:, 0:1] ** 2) - 4 * x_max * x[:, 0:1]) * ((x[:, 1:] - 1 / 2) ** 2)

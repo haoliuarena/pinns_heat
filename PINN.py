@@ -134,7 +134,7 @@ for i in range(1, steps + 1):
         # error = error.reshape(shape=[N_test_t, N_test_x]).transpose(1, 0).detach()
         # plot_mesh(X, T, error, name=f"error_{count}", error=err_l2_mean, folder=test_folder, iter=i)
         if i % (log_freq*2) == 0 or i == 1:
-            logger.info(f"| Iter: {i} | Loss: {loss.item():.4f} | Total_time: {(time.time() - start_time_a)/60:.1f}min")
+            logger.info(f"| Iter: {i} | Loss: {loss.item():.4f} | L2 Error: {err_l2_mean.item():.4f} | Total_time: {(time.time() - start_time_a)/60:.1f}min")
         count += 1
     # path = test_folder + "/A_results_dict.npy"
     # np.save(path, np.asarray(res_dict, dtype=object))
