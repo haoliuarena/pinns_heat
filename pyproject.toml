@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pinns-heat"
+version = "0.1.0"
+description = ""
+authors = ["haoliuarena <hao.liu@arena-ai.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "^2.4.1"
+numpy = "^2.1.1"
+matplotlib = "^3.9.2"
+pytz = "^2024.2"
+imageio = {extras = ["ffmpeg"], version = "^2.35.1"}
+deepxde = "^1.12.1"
+pydoe = "^0.3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
